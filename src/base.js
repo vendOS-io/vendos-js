@@ -14,10 +14,13 @@ const socket = new WebSocket('ws://fieldcommand:3000')
 let developmentMode = false
 
 socket.onmessage = event => {
-    //eve
     const data = JSON.parse(event.data)
+    console.log("into vendos:");
+    console.log(JSON.stringify(data))
+    
 
     if (data.type == 'machine' && data.id == undefined) {
+        console.log('Should be emitting to machineEvent')
         emitter.emit('machineEvent', data)
     } else {
         emitter.emit(`message.${data.id}`, data);

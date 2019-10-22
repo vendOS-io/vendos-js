@@ -3,6 +3,10 @@ import Base from '../base'
 
 class Machine extends Base {
 
+    constructor() {
+        super()
+    }
+
     async vend(action, data) {
         try {
             const response = await this.send({type: 'machine', action, ...data})
@@ -36,7 +40,6 @@ class Machine extends Base {
     optimalVend(data) {
         return this.vend('optimalVend', data);
     }
-
 
 }
 
