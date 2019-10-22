@@ -15,12 +15,7 @@ let developmentMode = false
 
 socket.onmessage = event => {
     const data = JSON.parse(event.data)
-    console.log("into vendos:");
-    console.log(JSON.stringify(data))
-    
-
     if (data.type == 'machine' && data.id == undefined) {
-        console.log('Should be emitting to machineEvent')
         emitter.emit('machineEvent', data)
     } else {
         emitter.emit(`message.${data.id}`, data);
@@ -44,6 +39,13 @@ class Base extends EventEmitter {
 
     constructor() {
         super()
+        this.machineEvents()
+    }
+
+    machineEvents() {
+        emitter.on('machineEvent', (event)=>{
+            this.emit('event', event)
+        })
     }
 
     async send(data) {        
