@@ -1,10 +1,11 @@
 // Grab all the actions and supply them the websocket connection
 import EventEmitter from 'wolfy87-eventemitter'
+
 import Mock from './mocks'
 
 const emitter = new EventEmitter();
 
-if (navigator.userAgent.indexOf("Chrome") == -1){
+if(navigator.userAgent.indexOf("Chrome") == -1) {
     console.error("It is highly recommended that you develop vendOS in Chrome v.77+.")
 }
 
@@ -25,7 +26,6 @@ socket.onmessage = event => {
 socket.onerror = event => {
     developmentMode = true
     console.log("%cPlease ignore the above WebSocket error - Its happening because you are running vendOS locally, no error will occur in production! \nAs vendOS is running in development mode, all promises resolve with a success after 5 seconds. \nHave fun making some cool apps! 🤙", "padding: 10px 0; color:#00c76b; font-size:15px")
-    console.log(developmentMode);
 };
 
 const sleep = (milliseconds) => {
