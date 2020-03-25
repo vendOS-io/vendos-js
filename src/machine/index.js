@@ -1,46 +1,48 @@
 import Base from '../base'
 
-
 class Machine extends Base {
 
-    constructor() {
-        super()
-    }
+  async vend (action, data) {
 
-    async vend(action, data) {
-        try {
-            const response = await this.send({type: 'machine', action, ...data})
-            
-            if(response.ok) {
-                return response
-            } else {
-                throw response
-            }
-        } catch (error) {
-            throw error
-        }
-    }
+    const response = await this.send({type: 'machine', action, ...data})
 
-    channels() {
-        return this.send({type: 'machine', action:'channels'})
-    }
+    // TODO: Discuss this approach in-depth
+    if(response.ok)
+      return response
+    else
+      throw response
 
-    status() {
-        return this.send({type: 'machine', action:'status'})
-    }
+  }
 
-    randomVend(data) {
-        return this.vend('randomVend', data);
-    }
+  channels () {
 
-    channelVend(data) {
-        return this.vend('channelVend', data);
-    }
+    return this.send({type: 'machine', action: 'channels'})
 
-    optimalVend(data) {
-        return this.vend('optimalVend', data);
-    }
+  }
 
+  status () {
+
+    return this.send({type: 'machine', action: 'status'})
+
+  }
+
+  randomVend (data) {
+
+    return this.vend('randomVend', data)
+
+  }
+
+  channelVend (data) {
+
+    return this.vend('channelVend', data)
+
+  }
+
+  optimalVend (data) {
+
+    return this.vend('optimalVend', data)
+
+  }
 }
 
 export default Machine

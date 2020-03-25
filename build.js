@@ -1,64 +1,123 @@
-const fs = require('fs');
-const { rollup } = require('rollup');
-const { minify } = require('terser');
-const pretty = require('pretty-bytes');
-const sizer = require('gzip-size');
-const pkg = require('./package');
-const resolve = require('rollup-plugin-node-resolve');
-const commonjs = require('rollup-plugin-commonjs');
-
-const umd = pkg['umd:main'];
-const date = new Date();
-
+#!/usr/bin/env node
+const argv = require('yargs').argv
+const {rollup, watch} = require('rollup')
+const pkg = require('./package')
+const resolve = require('@rollup/plugin-node-resolve')
+const commonjs = require('@rollup/plugin-commonjs')
+const terser = require('rollup-plugin-terser').terser
+const filesize = require('rollup-plugin-filesize')
+const builtins = require('rollup-plugin-node-builtins')
+const umd = pkg['umd:main']
+const date = new Date()
 const banner = `/*
+ * @license
  * vendOS v${ pkg.version }
- * (c) ${ date.getFullYear() } Social Vend Ltd. trading as vendOS 
+ * (c) ${ date.getFullYear() } Social Vend Ltd. trading as vendOS
  * Released under the MIT license
  * vendos.io
  */
-`;
+`
 
-console.info('Compiling.. ⌛');
+const umdOutputConfig = {
+  banner,
+  file: umd,
+  format: 'umd',
+  name: pkg['umd:name']
+}
 
-rollup({
+const cjsOutputConfig = {
+  banner,
+  format: 'cjs',
+  file: pkg.main
+}
+
+const esOutputConfig = {
+  banner,
+  format: 'es',
+  file: pkg.module
+}
+
+const devOutputConfig = {
+  banner,
+  format: 'iife',
+  file: 'dev/vendos.dev.js',
+  name: 'vendOS',
+  sourcemap: true
+}
+
+/* eslint-disable no-console */
+
+if (argv.development) {
+
+  console.info('Compiling and Watching... 👀')
+
+  const watcher = watch({
     input: 'src/index.js',
-    external: ['wolfy87-eventemitter']
-}).then(bun => {
-  bun.write({
-    banner,
-    format: 'cjs',
-    file: pkg.main,
-  });
+    output: devOutputConfig,
+    watch: {
+      include: 'src/**'
+    },
+    plugins: [
+      resolve(),
+      commonjs()
+    ]
+  })
 
-  bun.write({
-    banner,
-    format: 'es',
-    file: pkg.module,
-  });
+  watcher.on('event', event => {
 
-}).catch(console.error);
+    switch (event.code) {
 
-rollup({
-  input: 'src/index.js',
-  plugins: [ 
-    commonjs({
-      namedExports: {
-        'wolfy87-eventemitter': [ 'named' ]
-      }
-    }),
-    resolve() 
-  ]}).then(bun => {
-  bun.write({
-    banner,
-    file: umd,
-    format: 'umd',
-    name: pkg['umd:name'],
-  }).then(_ => {
-    const data = fs.readFileSync(umd, 'utf8');
-    const { code } = minify(data);
-    fs.writeFileSync(umd, `${banner}\n${code}`);
-    const int = sizer.sync(code);
-    console.info('Compilation complete! 🙌');
-    console.info(`~> gzip size: ${ pretty(int) }`);
-  }).catch(console.error);
-}).catch(console.error);
+      case 'START':
+        console.info('Change detected')
+        break
+      case 'END':
+        console.info('Bundle written')
+        break
+      case 'ERROR':
+      case 'FATAL':
+        console.error('Encountered an error:', event.error)
+        break
+    }
+  })
+} else {
+
+  console.info('Compiling... ⌛')
+
+  rollup({
+
+    input: 'src/index.js',
+    external: ['wolfy87-eventemitter'],
+    plugins: [
+      resolve(),
+      commonjs({
+        include: 'node_modules/**'
+      }),
+      terser({
+        include: [/^.+\.min\.js$/],
+        output: {
+          comments: function(node, comment) {
+            var text = comment.value
+            var type = comment.type
+            if (type == "comment2") {
+              // multiline comment
+              return /@preserve|@license|@cc_on/i.test(text)
+            }
+          }
+        }
+      }),
+      filesize({
+        render : function (options, bundle, {gzipSize}) {
+      		return `${bundle.file} ~> gzip size: ${gzipSize}`
+      	}
+      })
+    ]
+  }).then(bun => {
+
+    console.info('Compilation complete! 🙌')
+
+    bun.write(cjsOutputConfig)
+    bun.write(esOutputConfig)
+    bun.write(umdOutputConfig)
+
+  }).catch(console.error)
+}
