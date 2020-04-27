@@ -1,5 +1,5 @@
 import EventEmitter from 'wolfy87-eventemitter'
-import {VENDOS_WEBSOCKET_URL, SOCKET_CONNECTION_INTERVAL, SOCKET_CONNECTION_ATTEMPTS, DATA_TYPES, FAKE_SOCKET_DELAY} from './helpers/constants'
+import {VENDOS_WEBSOCKET_URL, SOCKET_CONNECTION_INTERVAL, SOCKET_CONNECTION_ATTEMPTS, DATA_TYPES, DEV_TOOLS_FLAG} from './helpers/constants'
 import {logInfo, logError} from './helpers/logging'
 
 class Socket extends EventEmitter {
@@ -13,15 +13,22 @@ class Socket extends EventEmitter {
     this.requestQueue = []
     this.messageHandlers = []
 
-    this.connect()
+    if (window[DEV_TOOLS_FLAG]) {
 
+      this.connectToDevtools()
+
+    } else {
+
+      this.connect()
+
+    }
   }
 
   send (data) {
 
     if (this.socket.readyState === WebSocket.OPEN) {
 
-      this.socket.send(data)
+      this.socket.send(JSON.stringify(data))
 
     } else {
 
@@ -38,7 +45,7 @@ class Socket extends EventEmitter {
 
       const {type, id} = data
 
-      if (type == 'machine' && id == undefined)
+      if (type == 'machine' || typeof id == 'undefined')
         this.emit('machineEvent', data)
       else
         this.emit(`message.${data.id}`, data)
@@ -72,7 +79,7 @@ class Socket extends EventEmitter {
 
     } else {
 
-      this.openFakeSocket()
+      this.failed()
 
     }
   }
@@ -88,6 +95,20 @@ class Socket extends EventEmitter {
 
   }
 
+  connectToDevtools () {
+
+    logInfo('Connecting to vendOS DevTools')
+
+    const devtools = window[DEV_TOOLS_FLAG]
+
+    this.socket = {
+
+      readyState: WebSocket.OPEN,
+      send: data => devtools.send(JSON.parse(data))
+
+    }
+  }
+
   flushQueue () {
 
     if (this.requestQueue.length) {
@@ -100,8 +121,7 @@ class Socket extends EventEmitter {
 
       const queue = [].concat(this.requestQueue).reverse().filter(data => {
 
-        const parsedData = JSON.parse(data)
-        const isMachineType = parsedData.type && parsedData.type === DATA_TYPES.MACHINE
+        const isMachineType = data.type && data.type === DATA_TYPES.MACHINE
         const removeRequest = machineTypeSent && isMachineType
 
         if (isMachineType)
@@ -118,28 +138,9 @@ class Socket extends EventEmitter {
     }
   }
 
-  openFakeSocket () {
+  failed () {
 
-    logInfo('Cannot connect to socket; falling back to auto-responses')
-
-    // At this point we want to fallback to auto responding with successful
-    // responses. This will likely happen if they are developing locally and
-    // have not installed the vendOS DevTools
-
-    this.socket = {
-
-      readyState: WebSocket.OPEN,
-      send: data => {
-
-        setTimeout(() => {
-
-          const response = {data: JSON.stringify({...JSON.parse(data), ok: true})}
-
-          this.message(response)
-
-        }, FAKE_SOCKET_DELAY)
-      }
-    }
+    logInfo('Could not connect to a Machine websocket. If you\'d like to test vendOS JS, please use the vendOS Chrome Dev Tools.')
 
     this.flushQueue()
 

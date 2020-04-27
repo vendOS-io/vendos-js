@@ -4,7 +4,7 @@ class Data extends Base {
 
   save (data) {
 
-    return this.send({type: 'data', action: 'set', save: data})
+    return this.send({resource: 'data', ...data})
 
   }
 }

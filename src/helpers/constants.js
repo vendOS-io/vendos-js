@@ -19,4 +19,4 @@ export const DATA_TYPES = {
 
 }
 
-export const FAKE_SOCKET_DELAY = 1000
+export const DEV_TOOLS_FLAG = '__VENDOS_DEVTOOLS_EXTENSION__'

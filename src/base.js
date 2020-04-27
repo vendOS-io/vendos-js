@@ -3,7 +3,6 @@ import Socket from './socket.js'
 
 let id = 0
 
-
 class Base extends EventEmitter {
 
   constructor () {
@@ -21,7 +20,7 @@ class Base extends EventEmitter {
 
     data.id = id++
 
-    Socket.send(JSON.stringify(data))
+    Socket.send(data)
 
     return await this.receive(data.id)
 

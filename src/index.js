@@ -1,7 +1,9 @@
-import Machine from './machine'
-import Instagram from './instagram'
-import Twitter from './twitter'
-import Data from './data'
+import Instagram from './social/instagram'
+import Twitter from './social/twitter'
+import Local from './data/local'
+import Cloud from './data/cloud'
+import Vend from './machine/vend'
+import Channels from './machine/channels'
 
 if (navigator.userAgent.indexOf('Chrome') === -1) {
 
@@ -13,11 +15,20 @@ class VendOS {
 
   constructor () {
 
-    this.Machine = new Machine()
-    this.Instagram = new Instagram()
-    this.Data = new Data()
-    this.Twitter = new Twitter()
+    this.Machine = {
+      vend: new Vend(),
+      channels: new Channels()
+    }
 
+    this.Social = {
+      twitter: new Twitter(),
+      instagram: new Instagram()
+    }
+
+    this.Data = {
+      local: new Local(),
+      cloud: new Cloud()
+    }
   }
 }
 
