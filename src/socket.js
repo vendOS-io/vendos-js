@@ -1,6 +1,7 @@
 import EventEmitter from 'wolfy87-eventemitter'
-import {VENDOS_WEBSOCKET_URL, SOCKET_CONNECTION_INTERVAL, SOCKET_CONNECTION_ATTEMPTS, DATA_TYPES, DEV_TOOLS_FLAG} from './helpers/constants'
+import {VENDOS_WEBSOCKET_URL, SOCKET_CONNECTION_INTERVAL, SOCKET_CONNECTION_ATTEMPTS, DEV_TOOLS_FLAG} from './helpers/constants'
 import {logInfo, logError} from './helpers/logging'
+import {immutablyRemoveKeysFromObject} from './helpers/misc'
 
 class Socket extends EventEmitter {
 
@@ -10,8 +11,6 @@ class Socket extends EventEmitter {
 
     this.socket
     this.socketAttempts = 0
-    this.requestQueue = []
-    this.messageHandlers = []
 
     if (window[DEV_TOOLS_FLAG]) {
 
@@ -30,25 +29,21 @@ class Socket extends EventEmitter {
 
       this.socket.send(JSON.stringify(data))
 
-    } else {
-
-      this.requestQueue.push(data)
-
     }
   }
 
   message (message) {
 
-    const data = JSON.parse(message.data || null)
+    const data = JSON.parse(message || null)
 
     if (data) {
 
-      const {type, id} = data
+      const {id} = data
 
-      if (type == 'machine' || typeof id == 'undefined')
+      if (typeof id == 'undefined')
         this.emit('machineEvent', data)
       else
-        this.emit(`message.${data.id}`, data)
+        this.emit(`message.${data.id}`, immutablyRemoveKeysFromObject(['id'], data))
 
     }
   }
@@ -107,42 +102,14 @@ class Socket extends EventEmitter {
       send: data => devtools.send(JSON.parse(data))
 
     }
-  }
 
-  flushQueue () {
+    devtools.listen(message => this.message(JSON.stringify(message)))
 
-    if (this.requestQueue.length) {
-
-      let machineTypeSent
-
-      // As the hardware does not accept concurrent machine requests we need to
-      // filter out the oldest requests of these types. The latest machine request
-      // should be kept in the queue
-
-      const queue = [].concat(this.requestQueue).reverse().filter(data => {
-
-        const isMachineType = data.type && data.type === DATA_TYPES.MACHINE
-        const removeRequest = machineTypeSent && isMachineType
-
-        if (isMachineType)
-          machineTypeSent = true
-
-        return !removeRequest
-
-      }).reverse()
-
-      this.requestQueue = []
-
-      queue.forEach(this.send.bind(this))
-
-    }
   }
 
   failed () {
 
     logInfo('Could not connect to a Machine websocket. If you\'d like to test vendOS JS, please use the vendOS Chrome Dev Tools.')
-
-    this.flushQueue()
 
   }
 }

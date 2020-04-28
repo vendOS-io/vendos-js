@@ -9,11 +9,11 @@ class Base extends EventEmitter {
 
     super()
 
-    Socket.on('machineEvent', data => {
-
-      this.emit(`message.${event.id}`, data)
-
-    })
+    // Socket.on('machineEvent', data => {
+    //
+    //   this.emit(`message.${event.id}`, data)
+    //
+    // })
   }
 
   async send (data) {

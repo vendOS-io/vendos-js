@@ -4,7 +4,7 @@ class Machine extends Base {
 
   async send (data) {
 
-    return super.send({resource: 'Machine', ...data})
+    return super.send({resource: 'machine', ...data})
 
   }
 }
