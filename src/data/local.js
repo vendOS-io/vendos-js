@@ -8,9 +8,33 @@ class Local extends Data {
 
   }
 
+  createSet (data) {
+
+    return this.send({method: 'createSet', ...data})
+
+  }
+
+  deleteSet (data) {
+
+    return this.send({method: 'deleteSet', ...data})
+
+  }
+
   save (data) {
 
     return this.send({method: 'save', ...data})
+
+  }
+
+  update (data) {
+
+    return this.send({method: 'update', ...data})
+
+  }
+
+  delete (data) {
+
+    return this.send({method: 'delete', ...data})
 
   }
 }
