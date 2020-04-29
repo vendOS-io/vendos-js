@@ -4,7 +4,7 @@ class Social extends Base {
 
   async send (...data) {
 
-    return this.super({resource: 'social', ...data})
+    return super.send({resource: 'social', ...data})
 
   }
 }

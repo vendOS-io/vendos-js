@@ -4,7 +4,7 @@ class Twitter extends Social {
 
   async send (...data) {
 
-    return this.super({action: 'twitter', ...data})
+    return super.send({action: 'twitter', ...data})
 
   }
 

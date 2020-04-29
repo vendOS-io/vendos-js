@@ -4,7 +4,7 @@ class Local extends Data {
 
   async send (data) {
 
-    return this.send({action: 'local', ...data})
+    return super.send({action: 'local', ...data})
 
   }
 
