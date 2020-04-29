@@ -9,7 +9,6 @@ class Socket extends EventEmitter {
 
     super()
 
-    this.socket
     this.socketAttempts = 0
 
     if (window[DEV_TOOLS_FLAG]) {
@@ -40,7 +39,7 @@ class Socket extends EventEmitter {
 
       const {id} = data
 
-      if (typeof id == 'undefined')
+      if (typeof id === 'undefined')
         this.emit('machineEvent', data)
       else
         this.emit(`message.${data.id}`, immutablyRemoveKeysFromObject(['id'], data))
@@ -99,11 +98,11 @@ class Socket extends EventEmitter {
     this.socket = {
 
       readyState: WebSocket.OPEN,
-      send: data => devtools.send(JSON.parse(data))
+      send: (data) => devtools.send(JSON.parse(data))
 
     }
 
-    devtools.listen(message => this.message(JSON.stringify(message)))
+    devtools.listen((message) => this.message(JSON.stringify(message)))
 
   }
 

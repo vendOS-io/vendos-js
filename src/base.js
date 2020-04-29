@@ -1,34 +1,26 @@
 import EventEmitter from 'wolfy87-eventemitter'
-import Socket from './socket.js'
+import Socket from './socket'
 
 let id = 0
 
 class Base extends EventEmitter {
 
-  constructor () {
-
-    super()
-
-    // Socket.on('machineEvent', data => {
-    //
-    //   this.emit(`message.${event.id}`, data)
-    //
-    // })
-  }
-
   async send (data) {
 
-    data.id = id++
+    const currentId = id++
 
-    Socket.send(data)
+    Socket.send({
+      ...data,
+      id: currentId
+    })
 
-    return await this.receive(data.id)
+    return this.receive(currentId)
 
   }
 
   receive (id) {
 
-    return new Promise(resolve => Socket.once(`message.${id}`, resolve))
+    return new Promise((resolve) => Socket.once(`message.${id}`, resolve))
 
   }
 }

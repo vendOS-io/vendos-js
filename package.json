@@ -8,7 +8,9 @@
   "umd:name": "vendOS",
   "scripts": {
     "build": "node build",
-    "dev": "node build --development"
+    "dev": "node build --development",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
   },
   "author": "@vendOS_io - developer@vendos.io",
   "license": "ISC",
@@ -16,6 +18,8 @@
     "@rollup/plugin-commonjs": "^11.0.2",
     "@rollup/plugin-node-resolve": "^7.1.1",
     "eslint": "^6.8.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-config-airbnb-base": "^14.1.0",
     "rollup": "^2.1.0",
     "rollup-plugin-filesize": "^6.2.1",
     "rollup-plugin-node-builtins": "^2.1.2",
