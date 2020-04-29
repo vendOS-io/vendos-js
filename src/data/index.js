@@ -2,7 +2,7 @@ import Base from '../base'
 
 class Data extends Base {
 
-  save (data) {
+  async send (data) {
 
     return super.send({resource: 'data', ...data})
 
