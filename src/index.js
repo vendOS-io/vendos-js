@@ -1,7 +1,6 @@
 import Instagram from './social/instagram'
 import Twitter from './social/twitter'
 import Local from './data/local'
-import Cloud from './data/cloud'
 import Vend from './machine/vend'
 import Channels from './machine/channels'
 
@@ -26,8 +25,7 @@ class VendOS {
     }
 
     this.Data = {
-      local: new Local(),
-      cloud: new Cloud()
+      local: new Local()
     }
   }
 }
