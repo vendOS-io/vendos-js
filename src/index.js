@@ -3,6 +3,7 @@ import Twitter from './social/twitter'
 import Local from './data/local'
 import Vend from './machine/vend'
 import Channels from './machine/channels'
+import Charge from './payment/charge'
 
 if (navigator.userAgent.indexOf('Chrome') === -1) {
 
@@ -26,6 +27,10 @@ class VendOS {
 
     this.Data = {
       local: new Local()
+    }
+
+    this.Payment = {
+      charge: new Charge()
     }
   }
 }
