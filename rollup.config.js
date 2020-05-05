@@ -50,7 +50,6 @@ export default [
 
   {
     input: 'src/index.js',
-    external: ['wolfy87-eventemitter'],
     plugins: [
       resolve(),
       commonjs({
@@ -80,7 +79,6 @@ export default [
       cjsOutputConfig,
       esOutputConfig,
       devOutputConfig
-    ],
-    watch: development ? {include: 'src/**'} : false
+    ]
   }
 ]

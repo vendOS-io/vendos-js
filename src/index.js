@@ -5,10 +5,11 @@ import Vend from './machine/vend'
 import Channels from './machine/channels'
 import Charge from './payment/charge'
 import Socket from './socket'
+import {logError} from './helpers/logging'
 
 if (navigator.userAgent.indexOf('Chrome') === -1) {
 
-  console.error('It is highly recommended that you develop vendOS in Chrome v.77+.')
+  logError('It is highly recommended that you develop vendOS in Chrome v.77+.')
 
 }
 
@@ -16,10 +17,7 @@ class VendOS {
 
   constructor () {
 
-
-    console.log('starting')
-
-    //Socket.connect()
+    Socket.connect()
 
     this.Machine = {
       vend: new Vend(),
