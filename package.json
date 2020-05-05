@@ -1,14 +1,14 @@
 {
-  "name": "vendos",
-  "version": "1.1.0",
+  "name": "vendos-js",
+  "version": "0.0.1",
   "description": "vendOS JS SDK is used to interact with any vending machine running vendOS ",
   "umd:main": "lib/vendos.min.js",
   "module": "lib/vendos.es.js",
   "main": "lib/vendos.js",
-  "umd:name": "vendOS",
+  "umd:name": "VendOS",
   "scripts": {
-    "build": "node build",
-    "dev": "node build --development",
+    "build": "rollup --config",
+    "dev": "NODE_ENV=development rollup --config",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix"
   },

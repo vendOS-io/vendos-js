@@ -4,6 +4,7 @@ import Local from './data/local'
 import Vend from './machine/vend'
 import Channels from './machine/channels'
 import Charge from './payment/charge'
+import Socket from './socket'
 
 if (navigator.userAgent.indexOf('Chrome') === -1) {
 
@@ -14,6 +15,11 @@ if (navigator.userAgent.indexOf('Chrome') === -1) {
 class VendOS {
 
   constructor () {
+
+
+    console.log('starting')
+
+    //Socket.connect()
 
     this.Machine = {
       vend: new Vend(),

@@ -11,15 +11,6 @@ class Socket extends EventEmitter {
 
     this.socketAttempts = 0
 
-    if (window[DEV_TOOLS_FLAG]) {
-
-      this.connectToDevtools()
-
-    } else {
-
-      this.connect()
-
-    }
   }
 
   send (data) {
@@ -79,6 +70,19 @@ class Socket extends EventEmitter {
   }
 
   connect () {
+
+    if (window[DEV_TOOLS_FLAG]) {
+
+      this.connectToDevtools()
+
+    } else {
+
+      this.connectToMachine()
+
+    }
+  }
+
+  connectToMachine () {
 
     logInfo('Attempting to connect to FieldCommand WebSocket')
 

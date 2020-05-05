@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const argv = require('yargs').argv
 const {rollup, watch} = require('rollup')
 const pkg = require('./package')
@@ -17,6 +16,8 @@ const banner = `/*
  * vendos.io
  */
 `
+
+const {development} = argv
 
 const umdOutputConfig = {
   banner,
@@ -41,50 +42,13 @@ const devOutputConfig = {
   banner,
   format: 'iife',
   file: 'dev/vendos.dev.js',
-  name: 'vendOS',
+  name: pkg['umd:name'],
   sourcemap: true
 }
 
-/* eslint-disable no-console */
+export default [
 
-if (argv.development) {
-
-  console.info('Compiling and Watching... 👀')
-
-  const watcher = watch({
-    input: 'src/index.js',
-    output: devOutputConfig,
-    watch: {
-      include: 'src/**'
-    },
-    plugins: [
-      resolve(),
-      commonjs()
-    ]
-  })
-
-  watcher.on('event', event => {
-
-    switch (event.code) {
-
-      case 'START':
-        console.info('Change detected')
-        break
-      case 'END':
-        console.info('Bundle written')
-        break
-      case 'ERROR':
-      case 'FATAL':
-        console.error('Encountered an error:', event.error)
-        break
-    }
-  })
-} else {
-
-  console.info('Compiling... ⌛')
-
-  rollup({
-
+  {
     input: 'src/index.js',
     external: ['wolfy87-eventemitter'],
     plugins: [
@@ -110,14 +74,13 @@ if (argv.development) {
       		return `${bundle.file} ~> gzip size: ${gzipSize}`
       	}
       })
-    ]
-  }).then(bun => {
-
-    console.info('Compilation complete! 🙌')
-
-    bun.write(cjsOutputConfig)
-    bun.write(esOutputConfig)
-    bun.write(umdOutputConfig)
-
-  }).catch(console.error)
-}
+    ],
+    output: [
+      umdOutputConfig,
+      cjsOutputConfig,
+      esOutputConfig,
+      devOutputConfig
+    ],
+    watch: development ? {include: 'src/**'} : false
+  }
+]
