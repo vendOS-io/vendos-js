@@ -14,9 +14,9 @@ class Charge extends Payment {
 
   }
 
-  withConfirmation (data) {
+  hold (data) {
 
-    return this.send({method: 'withConfirmation', ...data})
+    return this.send({method: 'hold', ...data})
 
   }
 

@@ -26,6 +26,12 @@ class Local extends Data {
 
   }
 
+  get (data) {
+
+    return this.send({method: 'get', ...data})
+
+  }
+
   update (data) {
 
     return this.send({method: 'update', ...data})
