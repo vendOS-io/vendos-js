@@ -20,8 +20,17 @@ class Base extends EventEmitter {
 
   receive (id) {
 
-    return new Promise((resolve) => Socket.once(`message.${id}`, resolve))
+    return new Promise((resolve, reject) => {
 
+      Socket.once(`message.${id}`, (res) => {
+
+        if (res.ok)
+          resolve(res)
+        else
+          reject(res)
+
+      })
+    })
   }
 }
 
