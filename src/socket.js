@@ -1,7 +1,7 @@
 import EventEmitter from 'wolfy87-eventemitter'
-import {VENDOS_WEBSOCKET_URL, SOCKET_CONNECTION_INTERVAL, SOCKET_CONNECTION_ATTEMPTS, DEV_TOOLS_FLAG} from './helpers/constants'
+import {VENDOS_WEBSOCKET_URL, CONNECTION_ATTEMPT_INTERVAL, CONNECTION_ATTEMPT_LIMIT, DEVTOOLS_FLAG, FIELD_COMMAND_FLAG, MESSAGES} from './helpers/constants'
 import {logInfo, logError} from './helpers/logging'
-import {immutablyRemoveKeysFromObject} from './helpers/misc'
+import {immutablyRemoveKeysFromObject, getEnvironmentVariable} from './helpers/misc'
 
 class Socket extends EventEmitter {
 
@@ -9,7 +9,7 @@ class Socket extends EventEmitter {
 
     super()
 
-    this.socketAttempts = 0
+    this.connectionAttempts = 0
 
   }
 
@@ -40,27 +40,78 @@ class Socket extends EventEmitter {
 
   open () {
 
+    logInfo(MESSAGES.CONNECTED_WEBSOCKET)
+
     this.socket.onclose = this.close.bind()
-    this.flushQueue()
 
   }
 
   close () {
 
-    logError('FieldCommand WebSocket closed')
+    logError(MESSAGES.WEBSOCKET_CLOSED)
 
-    this.socketAttempts = 0
-    this.reconnect()
+    this.connectionAttempts = 0
+    this.connectToMachine()
 
   }
 
-  reconnect () {
+  connect () {
 
-    this.socketAttempts++
+    if (getEnvironmentVariable(FIELD_COMMAND_FLAG)) {
 
-    if (SOCKET_CONNECTION_ATTEMPTS - this.socketAttempts > 0) {
+      this.connectToMachine()
 
-      setTimeout(() => this.connect(), SOCKET_CONNECTION_INTERVAL)
+    } else {
+
+      this.connectToDevtools()
+
+    }
+  }
+
+  connectToMachine () {
+
+    logInfo(MESSAGES.WEBSOCKET_ATTEMPT)
+
+    this.socket = new WebSocket(VENDOS_WEBSOCKET_URL)
+    this.socket.onclose = this.reconnectToMachine.bind(this)
+    this.socket.onopen = this.open.bind(this)
+    this.socket.onmessage = this.message.bind(this)
+
+  }
+
+  connectToDevtools () {
+
+    logInfo(MESSAGES.DEVTOOLS_ATTEMPT)
+
+    if (window[DEVTOOLS_FLAG]) {
+
+      const devtools = window[DEVTOOLS_FLAG]
+
+      this.socket = {
+
+        readyState: WebSocket.OPEN,
+        send: (data) => devtools.send(JSON.parse(data))
+
+      }
+
+      devtools.listen((message) => this.message(JSON.stringify(message)))
+
+      logInfo(MESSAGES.CONNECTED_DEVTOOLS)
+
+    } else {
+
+      setTimeout(this.reconnectToDevtools.bind(this), 500)
+
+    }
+  }
+
+  reconnectToMachine () {
+
+    this.connectionAttempts++
+
+    if (CONNECTION_ATTEMPT_LIMIT - this.connectionAttempts > 0) {
+
+      setTimeout(this.connectToMachine.bind(this), CONNECTION_ATTEMPT_INTERVAL)
 
     } else {
 
@@ -69,51 +120,32 @@ class Socket extends EventEmitter {
     }
   }
 
-  connect () {
+  reconnectToDevtools () {
 
-    if (window[DEV_TOOLS_FLAG]) {
+    this.connectionAttempts++
 
-      this.connectToDevtools()
+    if (CONNECTION_ATTEMPT_LIMIT - this.connectionAttempts > 0) {
+
+      setTimeout(this.connectToDevtools.bind(this), CONNECTION_ATTEMPT_INTERVAL)
 
     } else {
 
-      this.connectToMachine()
+      this.failed()
 
     }
-  }
-
-  connectToMachine () {
-
-    logInfo('Attempting to connect to FieldCommand WebSocket')
-
-    this.socket = new WebSocket(VENDOS_WEBSOCKET_URL)
-    this.socket.onclose = this.reconnect.bind(this)
-    this.socket.onopen = this.open.bind(this)
-    this.socket.onmessage = this.message.bind(this)
-
-  }
-
-  connectToDevtools () {
-
-    logInfo('Connecting to vendOS DevTools')
-
-    const devtools = window[DEV_TOOLS_FLAG]
-
-    this.socket = {
-
-      readyState: WebSocket.OPEN,
-      send: (data) => devtools.send(JSON.parse(data))
-
-    }
-
-    devtools.listen((message) => this.message(JSON.stringify(message)))
-
   }
 
   failed () {
 
-    logInfo('Could not connect to a Machine websocket. If you\'d like to test vendOS JS, please use the vendOS Chrome Dev Tools.')
+    if (getEnvironmentVariable(FIELD_COMMAND_FLAG)) {
 
+      logError(MESSAGES.WEBSOCKET_CONNECTION_FAILED)
+
+    } else {
+
+      logError(MESSAGES.DEVTOOLS_CONNECTION_FAILED)
+
+    }
   }
 }
 

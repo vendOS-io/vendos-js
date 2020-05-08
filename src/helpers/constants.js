@@ -7,8 +7,8 @@ export const CONSOLE_STYLES = {
 
 export const CONSOLE_PREFIX = 'VendOS SDK'
 
-export const SOCKET_CONNECTION_INTERVAL = 100
-export const SOCKET_CONNECTION_ATTEMPTS = 5
+export const CONNECTION_ATTEMPT_INTERVAL = 100
+export const CONNECTION_ATTEMPT_LIMIT = 5
 
 export const DATA_TYPES = {
 
@@ -19,4 +19,18 @@ export const DATA_TYPES = {
 
 }
 
-export const DEV_TOOLS_FLAG = '__VENDOS_DEVTOOLS_EXTENSION__'
+export const DEVTOOLS_URL = '[URL]'
+export const DEVTOOLS_FLAG = '__VENDOS_DEVTOOLS_EXTENSION__'
+export const FIELD_COMMAND_FLAG = '__VENDOS_FIELD_COMMAND_VERSION__'
+
+export const MESSAGES = {
+
+  WEBSOCKET_ATTEMPT: 'Attempting to connect to WebSocket on FieldCommand.',
+  DEVTOOLS_ATTEMPT: 'Attempting to connect to vendOS DevTools.',
+  CONNECTED_DEVTOOLS: 'Connected to vendOS DevTools.',
+  CONNECTED_WEBSOCKET: `Connected to WebSocket on FieldCommand V${FIELD_COMMAND_FLAG}`,
+  WEBSOCKET_CLOSED: 'WebSocket on FieldCommand was closed.',
+  DEVTOOLS_CONNECTION_FAILED: `Could not connect to vendOS DevTools. If you'd like to test vendOS JS, please use the vendOS Chrome DevTools ${DEVTOOLS_URL}, and make sure you click the vendOS DevTools browserAction button in the top-right of the Chrome toolbar in order to activate them for this tab.`,
+  WEBSOCKET_CONNECTION_FAILED: 'Could not connect to WebSockets. Make sure you\'re running on a machine with access to FieldCommand.'
+
+}
