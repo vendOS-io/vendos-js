@@ -87,27 +87,18 @@ class Socket extends EventEmitter {
 
       const devtools = window[DEVTOOLS_FLAG]
 
-      const unlisten = devtools.listen(message => {
+      this.socket = {
 
-        if (message.id === 'handshake') {
+        readyState: WebSocket.OPEN,
+        send: (data) => devtools.send(JSON.parse(data))
 
-          unlisten()
+      }
 
-          this.socket = {
-
-            readyState: WebSocket.OPEN,
-            send: (data) => devtools.send(JSON.parse(data))
-
-          }
-
-          devtools.listen((message) => this.message(JSON.stringify(message)))
-
-          logInfo(MESSAGES.CONNECTED_DEVTOOLS)
-
-        }
-      })
+      devtools.listen((message) => this.message(JSON.stringify(message)))
 
       devtools.handshake()
+
+      logInfo(MESSAGES.CONNECTED_DEVTOOLS)
 
     } else {
 
