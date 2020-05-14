@@ -1,26 +1,31 @@
 {
   "name": "vendos",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "description": "vendOS JS SDK is used to interact with any vending machine running vendOS ",
   "umd:main": "lib/vendos.min.js",
   "module": "lib/vendos.es.js",
   "main": "lib/vendos.js",
-  "umd:name": "vendOS",
+  "umd:name": "VendOS",
   "scripts": {
-    "build": "node build"
+    "build": "rollup --config",
+    "dev": "NODE_ENV=development rollup --config --watch",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
   },
   "author": "@vendOS_io - developer@vendos.io",
   "license": "ISC",
   "devDependencies": {
-    "gzip-size": "^4.1.0",
-    "pretty-bytes": "^4.0.2",
-    "rollup": "^1.21.4",
-    "rollup-plugin-buble": "^0.19.8",
-    "rollup-plugin-commonjs": "^10.1.0",
+    "@rollup/plugin-commonjs": "^11.0.2",
+    "@rollup/plugin-node-resolve": "^7.1.1",
+    "eslint": "^6.8.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "rollup": "^2.1.0",
+    "rollup-plugin-filesize": "^6.2.1",
     "rollup-plugin-node-builtins": "^2.1.2",
-    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^5.3.0",
     "terser": "^4.3.2",
-    "uglify-js": "^3.6.0"
+    "yargs": "^15.3.1"
   },
   "dependencies": {
     "wolfy87-eventemitter": "^5.2.8"
