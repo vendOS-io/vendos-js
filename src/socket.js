@@ -15,7 +15,7 @@ class Socket extends EventEmitter {
 
   send (data) {
 
-    if (this.socket.readyState === WebSocket.OPEN) {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
 
       this.socket.send(JSON.stringify(data))
 
